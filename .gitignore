@@ -103,4 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
+# Local Netlify folder
+.netlify
+
+.DS_Store
 /svgs/
