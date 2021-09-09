@@ -1,0 +1,30 @@
+{
+  "name": "a11y-badges",
+  "version": "1.0.0",
+  "description": "accessible badges for profile and project READMEs (and everything else!)",
+  "main": "index.js",
+  "scripts": {
+    "it": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ctcpip/a11y-badges.git"
+  },
+  "author": "Chris de Almeida",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ctcpip/a11y-badges/issues"
+  },
+  "homepage": "https://github.com/ctcpip/a11y-badges#readme",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "get-contrast": "^3.0.0",
+    "simple-icons": "^5.13.0"
+  },
+  "dependencies": {
+    "@svgdotjs/svg.js": "^3.1.1",
+    "svgdom": "^0.1.8",
+    "svgo": "^2.5.0"
+  }
+}
