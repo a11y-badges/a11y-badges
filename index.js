@@ -5,21 +5,15 @@ const { createSVGWindow } = require('svgdom');
 const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 const { optimize } = require('svgo');
 
-// sanitize custom svg
-
 for (const slug of Object.keys(simpleIcons)) {
 
   const icon = simpleIcons.Get(slug);
   // const icon = simpleIcons.Get('ibm');
   // const icon = simpleIcons.Get('openapiinitiative');
 
-  const htmlSafeColor = `#${escapeHTML(icon.hex)}`;
-  const htmlSafeTitle = escapeHTML(icon.title);
-  const htmlSafeSlug = escapeHTML(icon.slug);
-
   console.debug(`generating: ${slug}`);
 
-  fs.writeFileSync(`./svgs/${htmlSafeSlug}.svg`, renderSVG(htmlSafeColor, icon.svg, icon.path, htmlSafeTitle));
+  fs.writeFileSync(`./svgs/${icon.slug}.svg`, renderSVG(`#${icon.hex}`, icon.svg, icon.path, icon.title));
   // break;
 }
 
@@ -118,11 +112,4 @@ function renderSVG(badgeColor, logo, path, text, fillColor) {
 
   return optimizedSVG.data;
 
-}
-
-function escapeHTML(str) {
-  return str.replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }
