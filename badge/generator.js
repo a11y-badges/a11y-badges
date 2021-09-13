@@ -3,6 +3,7 @@ const simpleIcons = require('simple-icons');
 const { createSVGWindow } = require('svgdom');
 const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 const { optimize } = require('svgo');
+const feather = require('feather-icons');
 
 const defaultBadgeColor = 'dimgrey';
 
@@ -13,30 +14,85 @@ module.exports = {
 
 function getBadge(badgeColor, logo, logoColor, text, textColor) {
 
-  let useBadgeColor = badgeColor;
-  let useLogo = logo;
+  let useBadgeColor, useLogo, icon;
   let useLogoPath = '';
   let useText = text;
 
   const useLogoColor = logoColor;
   const useTextColor = textColor;
 
-  if (useLogo && !useLogo.startsWith('data:image') && !useLogo.startsWith('<svg')) {
+  const { badgeColorIsValid, color } = getBadgeColor(badgeColor);
 
-    const icon = simpleIcons.Get(logo);
+  useBadgeColor = color;
 
-    useBadgeColor = useBadgeColor || `#${icon.hex}`;
-    useLogo = icon.svg;
-    useLogoPath = icon.path;
-    useText = useText || icon.title;
+  if (logo) {
+
+    if (logo.startsWith('data:image') || logo.startsWith('<svg')) {
+      useLogo = logo;
+    }
+    else {
+
+      icon = simpleIcons.Get(logo);
+
+      // first look for simple-icon
+      if (icon) {
+        useBadgeColor = badgeColorIsValid ? useBadgeColor : `#${icon.hex}`;
+        useLogo = icon.svg;
+        useLogoPath = icon.path;
+        useText = useText || icon.title;
+      }
+      // then look for feather icon
+      else {
+
+        icon = feather.icons[logo];
+
+        if (icon) { useLogo = icon.toSvg({ 'stroke-width': 2.5 }); }
+
+      }
+
+    }
 
   }
-
-  useBadgeColor = useBadgeColor || defaultBadgeColor;
 
   console.debug(`generating badge: ${useText}`);
 
   return renderSVG(useBadgeColor, useLogo, useLogoPath, useLogoColor, useText, useTextColor);
+}
+
+function normalizeColor(color) {
+
+  let rColor = color.trim();
+
+  const reHex = /^#?(?:[0-9a-fA-F]{3}){1,2}$/;
+
+  if (color.match(reHex) && !color.startsWith('#')) {
+    rColor = `#${color}`;
+  }
+
+  return rColor;
+
+}
+
+function getBadgeColor(badgeColor) {
+
+  let color;
+
+  if (badgeColor) {
+
+    color = normalizeColor(badgeColor);
+
+    try {
+      // check if badge color is valid
+      contrast.isAccessible(color, defaultBadgeColor);
+      return { badgeColorIsValid: true, color };
+    }
+    catch (error) {
+      // Liverpool FC is the best football club in the world! ⚽
+    }
+  }
+
+  return { badgeColorIsValid: false, color: defaultBadgeColor };
+
 }
 
 function renderSVG(badgeColor, logo, logoPath, logoColor, text = '', textColor) {
@@ -93,7 +149,7 @@ function addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding) {
   const normalizationTarget = 27;
   const logoColorFill = getFillColor(badgeColor, logoColor);
 
-  let decodedLogo;
+  let decodedLogo, fillReplacedLogo;
 
   const gLogo = canvas.group();
 
@@ -116,7 +172,20 @@ function addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding) {
     decodedLogo = Buffer.from(logoParts[1], 'base64').toString('utf-8');
   }
 
-  const fillReplacedLogo = decodedLogo.replace(/fill="[^"]*"/g, `fill="${logoColorFill}"`);
+  // duck type the svg
+  if (decodedLogo.match(/fill="(?!none)[^"]*"/)) {
+    // looks like a custom svg
+    fillReplacedLogo = decodedLogo.replace(/fill="[^"]*"/g, `fill="${logoColorFill}"`);
+  }
+  else if (decodedLogo.match(/fill="none"/)) {
+    // looks like a feather icon
+    fillReplacedLogo = decodedLogo.replace(/<svg/, `<svg color="${logoColorFill}"`);
+  }
+  else {
+    // looks like a simple icon
+    fillReplacedLogo = decodedLogo.replace(/<svg/, `<svg fill="${logoColorFill}"`);
+  }
+
   const logoElement = gLogo.image(`data:image/svg+xml;base64,${Buffer.from(fillReplacedLogo, 'utf-8').toString('base64')}`);
 
   // const utf8SVG = Buffer.from(svgText, 'utf-8').toString();
@@ -162,23 +231,28 @@ function addText(canvas, text, textColor, badgeColor, sidePadding, renderedLogoW
 
 function getFillColor(badgeColor, fillColor) {
 
+  let fill;
+
   if (fillColor) {
+
+    fill = normalizeColor(fillColor);
+
     try {
-      if (fillColor && contrast.isAccessible(badgeColor, fillColor)) {
-        return fillColor;
+
+      if (contrast.isAccessible(badgeColor, fill)) {
+        return fill;
       }
 
-      console.debug(`color '${fillColor}' does not have enough contrast for badge color: ${badgeColor}`);
+      // not enough contrast
 
     }
     catch (error) {
-      console.debug(`invalid color: ${fillColor}`);
-    // got a bad color
+      // invalid color
     }
 
   }
 
-  let fill = '#000';
+  fill = '#000';
 
   if (contrast.isAccessible(badgeColor, fill)) {
     return fill;
