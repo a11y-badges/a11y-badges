@@ -4,6 +4,8 @@ const { createSVGWindow } = require('svgdom');
 const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 const { optimize } = require('svgo');
 const feather = require('feather-icons');
+const txml = require('txml');
+const { json } = require('express');
 
 const defaultBadgeColor = 'dimgrey';
 
@@ -147,9 +149,6 @@ function addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding) {
 
   const logoWidth = 32;
   const normalizationTarget = 27;
-  const logoColorFill = getFillColor(badgeColor, logoColor);
-
-  let decodedLogo, fillReplacedLogo;
 
   const gLogo = canvas.group();
 
@@ -164,6 +163,8 @@ function addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding) {
 
   renderedPath.remove();
 
+  let decodedLogo;
+
   if (logo.startsWith('<svg')) {
     decodedLogo = logo;
   }
@@ -172,25 +173,9 @@ function addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding) {
     decodedLogo = Buffer.from(logoParts[1], 'base64').toString('utf-8');
   }
 
-  // duck type the svg
-  if (decodedLogo.match(/fill="(?!none)[^"]*"/)) {
-    // looks like a custom svg
-    fillReplacedLogo = decodedLogo.replace(/fill="[^"]*"/g, `fill="${logoColorFill}"`);
-  }
-  else if (decodedLogo.match(/fill="none"/)) {
-    // looks like a feather icon
-    fillReplacedLogo = decodedLogo.replace(/<svg/, `<svg color="${logoColorFill}"`);
-  }
-  else {
-    // looks like a simple icon
-    fillReplacedLogo = decodedLogo.replace(/<svg/, `<svg fill="${logoColorFill}"`);
-  }
+  const modifiedLogo = setLogoColor(badgeColor, logoColor, decodedLogo);
 
-  const logoElement = gLogo.image(`data:image/svg+xml;base64,${Buffer.from(fillReplacedLogo, 'utf-8').toString('base64')}`);
-
-  // const utf8SVG = Buffer.from(svgText, 'utf-8').toString();
-  // const logoElement = gLogo.image(`data:image/svg+xml;utf8,${utf8SVG}`);
-  // const logoElement = gLogo.path(path);
+  const logoElement = gLogo.image(`data:image/svg+xml;base64,${Buffer.from(modifiedLogo, 'utf-8').toString('base64')}`);
 
   logoElement
     .height(logoWidth + dimensionalAdjustment)
@@ -198,6 +183,44 @@ function addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding) {
     .move(sidePadding, -dimensionalAdjustment / 2);
 
   return logoElement;
+
+}
+
+function setLogoColor(badgeColor, logoColor, decodedLogo) {
+
+  const logoColorFill = getFillColor(badgeColor, logoColor);
+
+  const xml = txml.parse(decodedLogo);
+  const [svg] = xml;
+
+  let applyColorToRootElement = !svg.attributes.fill || svg.attributes.fill !== 'none';
+
+  if (svg.attributes.fill && svg.attributes.fill === 'none' && svg.attributes.stroke) {
+    applyColorToRootElement = false;
+    svg.attributes.stroke = logoColorFill;
+  }
+
+  if (applyColorToRootElement) {
+    svg.attributes.color = logoColorFill;
+    svg.attributes.fill = logoColorFill;
+  }
+
+  for (const e of svg.children) {
+
+    if (e.attributes.fill) {
+
+      if (e.attributes.stroke && e.attributes.fill === 'none') {
+        e.attributes.stroke = logoColorFill;
+      }
+      else {
+        e.attributes.fill = logoColorFill;
+      }
+
+    }
+
+  }
+
+  return txml.stringify(xml);
 
 }
 

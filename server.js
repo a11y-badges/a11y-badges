@@ -3,32 +3,50 @@ const { getBadge } = require('./badge/generator');
 const helmet = require('helmet');
 
 const app = express();
+
+app.set('query parser', queryString => {
+
+  if (!queryString) {
+    return '';
+  }
+
+  const params = {};
+
+  for (const p of queryString.split('&')) {
+
+    const keyValueDelimiterIndex = p.indexOf('=');
+
+    const key = p.substring(0, keyValueDelimiterIndex).toLowerCase();
+    const value = p.substring(keyValueDelimiterIndex + 1);
+
+    params[key] = value;
+
+  }
+
+  return params;
+
+});
+
 const port = 4751;
 
 app.use(helmet());
 
 app.use(express.static('site'));
 
-app.use((req, res, next) => {
-  // make query params case-insensitive
-  req.query = new Proxy(req.query, {
-    get: (target, name) => {
-      return target[Object.keys(target)
-        .find(key => { return key.toLowerCase() === name.toLowerCase(); })];
-    }
-  });
-
-  next();
-
-});
-
 app.get('/badge', (req, res) => {
 
-  const { badgeColor, logo, logoColor, text, textColor } = req.query;
+  // query strings are normalized to lowercase
+  const { badgecolor, logo, logocolor, text, textcolor } = req.query;
 
   res.set('Content-Type', 'image/svg+xml;charset=utf-8');
 
-  res.send(getBadge(badgeColor, logo, logoColor, text, textColor));
+  let useText;
+
+  if (typeof text === 'string') {
+    useText = text.replace(/_/g, ' ');
+  }
+
+  res.send(getBadge(badgecolor, logo, logocolor, useText, textcolor));
 
 });
 
