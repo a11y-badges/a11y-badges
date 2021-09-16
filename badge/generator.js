@@ -5,7 +5,6 @@ const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 const { optimize } = require('svgo');
 const feather = require('feather-icons');
 const txml = require('txml');
-const { json } = require('express');
 
 const defaultBadgeColor = 'dimgrey';
 
