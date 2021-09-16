@@ -1,6 +1,6 @@
 # a11y badges
 
-![a11y-badges](https://a11ybadges.com/badge?logo=check-square&text=a11y%20badges&badgeColor=green)
+![a11y-badges](https://a11ybadges.com/badge?logo=check-square&text=a11y_badges&badgeColor=green)
 
 [accessible](https://www.w3.org/WAI/fundamentals/accessibility-intro/) badges for profile and project READMEs (and everything else!)
 
