@@ -15,7 +15,7 @@ function writeTestBadge(badgeColor, logo, logoColor, text, textColor) { // eslin
     fs.mkdirSync(svgDir);
   }
 
-  fs.writeFileSync(`${svgDir}/testBadge.svg`, getBadge(badgeColor, logo, logoColor, text, textColor));
+  fs.writeFileSync(`${svgDir}/testBadge.svg`, getBadge({ badgeColor, logo, logoColor, text, textColor }));
 
 }
 

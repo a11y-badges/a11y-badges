@@ -7,7 +7,7 @@ exports.handler = async function(event, /* context */) { // eslint-disable-line 
   return {
     statusCode: 200,
     headers: { 'content-type': 'image/svg+xml;charset=utf-8' },
-    body: getBadge(badgeColor, logo, logoColor, text, textColor),
+    body: getBadge({ badgeColor, logo, logoColor, text, textColor }),
   };
 
 };

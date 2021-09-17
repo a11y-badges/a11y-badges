@@ -13,7 +13,7 @@ module.exports = {
   renderSVG,
 };
 
-function getBadge(badgeColor, logo, logoColor, text, textColor) {
+function getBadge({ badgeColor, logo, logoColor, text, textColor } = {}) {
 
   let useBadgeColor, useLogo, icon;
   let useLogoPath = '';
@@ -168,8 +168,16 @@ function addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding) {
     decodedLogo = logo;
   }
   else {
+
     const logoParts = logo.split(',');
-    decodedLogo = Buffer.from(logoParts[1], 'base64').toString('utf-8');
+
+    try {
+      decodedLogo = Buffer.from(logoParts[1], 'base64').toString('utf-8');
+    }
+    catch (error) {
+      return null;
+    }
+
   }
 
   const modifiedLogo = setLogoColor(badgeColor, logoColor, decodedLogo);

@@ -46,7 +46,7 @@ app.get('/badge', (req, res) => {
     useText = text.replace(/_/g, ' ');
   }
 
-  res.send(getBadge(badgecolor, logo, logocolor, useText, textcolor));
+  res.send(getBadge({ badgeColor: badgecolor, logo, logoColor: logocolor, text: useText, textColor: textcolor }));
 
 });
 

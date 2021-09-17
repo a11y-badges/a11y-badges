@@ -7,7 +7,7 @@
     "build": "./build.sh",
     "it": "node index.js",
     "server": "node server.js",
-    "test": "eslint ."
+    "test": "eslint . && jasmine"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/ctcpip/a11y-badges#readme",
   "devDependencies": {
-    "eslint": "^7.32.0"
+    "eslint": "^7.32.0",
+    "jasmine": "^3.9.0"
   },
   "dependencies": {
     "@svgdotjs/svg.js": "^3.1.1",
