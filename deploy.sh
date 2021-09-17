@@ -1,6 +1,7 @@
 #!/bin/sh
 
 LOGIN=$1;
+NEW_DEPS=$2;
 
 rm -rf ./dist/ &&
 ./node_modules/eslint/bin/eslint.js . || exit 1 ;
@@ -16,4 +17,9 @@ rsync -crv -e ssh --delete --rsync-path="/usr/local/bin/sudo /usr/local/bin/rsyn
 
 rsync -crv -e ssh --delete --exclude 'node_modules' --rsync-path="/usr/local/bin/sudo /usr/local/bin/rsync" ./dist/app/ "$LOGIN@a11ybadges.com:/usr/local/a11ybadges"
 
-ssh "$LOGIN@a11ybadges.com" "export PATH=/usr/home/$LOGIN/.nvm/versions/node/v14.17.6/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/home/$LOGIN/bin && cd /usr/local/a11ybadges && /usr/local/bin/sudo /usr/home/$LOGIN/.nvm/versions/node/v14.17.6/bin/npm ci && /usr/local/bin/sudo pm2 reload -u www server"
+if [ "$NEW_DEPS" = "true" ]
+then
+  ssh "$LOGIN@a11ybadges.com" "export PATH=/usr/home/$LOGIN/.nvm/versions/node/v14.17.6/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/home/$LOGIN/bin && cd /usr/local/a11ybadges && /usr/local/bin/sudo /usr/home/$LOGIN/.nvm/versions/node/v14.17.6/bin/npm ci && /usr/local/bin/sudo pm2 reload -u www server -i 2 --wait-ready --listen-timeout 30000"
+else
+  ssh "$LOGIN@a11ybadges.com" "export PATH=/usr/home/$LOGIN/.nvm/versions/node/v14.17.6/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/home/$LOGIN/bin && /usr/local/bin/sudo pm2 reload -u www server -i 2 --wait-ready --listen-timeout 30000"
+fi

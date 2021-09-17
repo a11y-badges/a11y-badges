@@ -50,6 +50,15 @@ app.get('/badge', (req, res) => {
 
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
+  process.send('ready');
   console.log(`listening on port http://localhost:${port}`);
+});
+
+process.on('SIGINT', () => {
+  server.close();
+});
+
+process.on('SIGTERM', () => {
+  server.close();
 });
