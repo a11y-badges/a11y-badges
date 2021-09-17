@@ -4,7 +4,6 @@
   "description": "accessible badges for profile and project READMEs (and everything else!)",
   "main": "index.js",
   "scripts": {
-    "build": "./build.sh",
     "it": "node index.js",
     "server": "node server.js",
     "test": "eslint . && jasmine"
