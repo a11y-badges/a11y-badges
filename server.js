@@ -36,7 +36,15 @@ app.use(express.static('site'));
 app.get('/badge', (req, res) => {
 
   // query strings are normalized to lowercase
-  const { badgecolor, logo, logocolor, text, textcolor } = req.query;
+  const {
+    badgecolor,
+    label,
+    labelcolor,
+    logo,
+    logocolor,
+    text,
+    textcolor
+  } = req.query;
 
   res.set('Content-Type', 'image/svg+xml;charset=utf-8');
 
@@ -46,7 +54,7 @@ app.get('/badge', (req, res) => {
     useText = text.replace(/_/g, ' ');
   }
 
-  res.send(getBadge({ badgeColor: badgecolor, logo, logoColor: logocolor, text: useText, textColor: textcolor }));
+  res.send(getBadge({ badgeColor: badgecolor, label, labelColor: labelcolor, logo, logoColor: logocolor, text: useText, textColor: textcolor }));
 
 });
 

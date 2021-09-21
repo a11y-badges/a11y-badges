@@ -111,7 +111,7 @@ coming soon!
 ## how it works
 
 1. [WCAG 2.x contrast requirements](https://www.w3.org/TR/WCAG21#contrast-minimum) are enforced regardless of input. if you are not seeing the colors you specified, use [a contrast checker tool](https://webaim.org/resources/contrastchecker) to verify the colors have sufficient contrast
-1. `badgeColor` is prioritized over `logoColor` and `textColor`. 
+1. `badgeColor` is prioritized over `logoColor` and `textColor`.
 1. for the `logo` parameter, the precedence is:
     * data URI
     * simple icon

@@ -33,7 +33,7 @@ function writeAllSimpleIconSVGsToDisk() { // eslint-disable-line no-unused-vars
 
     console.debug(`generating: ${icon.slug}`);
 
-    fs.writeFileSync(`${svgDir}/${icon.slug}.svg`, renderSVG(`#${icon.hex}`, icon.svg, icon.path, null, icon.title, null));
+    fs.writeFileSync(`${svgDir}/${icon.slug}.svg`, renderSVG({ badgeColor: `#${icon.hex}`, logo: icon.svg, logoPath: icon.path, text: icon.title }));
 
   }
 

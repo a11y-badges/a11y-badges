@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 const contrast = require('get-contrast');
 const simpleIcons = require('simple-icons');
 const { createSVGWindow } = require('svgdom');
@@ -13,18 +15,21 @@ module.exports = {
   renderSVG,
 };
 
-function getBadge({ badgeColor, logo, logoColor, text, textColor } = {}) {
+function getBadge({ badgeColor, label, labelColor, logo, logoColor, text, textColor } = {}) { // eslint-disable-line complexity
 
   let useBadgeColor, useLogo, icon;
   let useLogoPath = '';
   let useText = text;
 
-  const useLogoColor = logoColor;
-  const useTextColor = textColor;
-
   const { badgeColorIsValid, color } = getBadgeColor(badgeColor);
 
-  useBadgeColor = color;
+  if (label && !badgeColor) {
+    // make sure the left and right sides don't have the same background color
+    useBadgeColor = 'green';
+  }
+  else {
+    useBadgeColor = color;
+  }
 
   if (logo) {
 
@@ -37,7 +42,7 @@ function getBadge({ badgeColor, logo, logoColor, text, textColor } = {}) {
 
       // first look for simple-icon
       if (icon) {
-        useBadgeColor = badgeColorIsValid ? useBadgeColor : `#${icon.hex}`;
+        useBadgeColor = badgeColor && badgeColorIsValid ? useBadgeColor : `#${icon.hex}`;
         useLogo = icon.svg;
         useLogoPath = icon.path;
         useText = useText || icon.title;
@@ -57,7 +62,12 @@ function getBadge({ badgeColor, logo, logoColor, text, textColor } = {}) {
 
   console.debug(`generating badge: ${useText}`);
 
-  return renderSVG(useBadgeColor, useLogo, useLogoPath, useLogoColor, useText, useTextColor);
+  const svg = renderSVG({ badgeColor: useBadgeColor, label, labelColor, logo: useLogo, logoPath: useLogoPath, logoColor, text: useText, textColor });
+
+  // console.debug(svg);
+
+  return svg;
+
 }
 
 function normalizeColor(color) {
@@ -96,7 +106,7 @@ function getBadgeColor(badgeColor) {
 
 }
 
-function renderSVG(badgeColor, logo, logoPath, logoColor, text = '', textColor) {
+function renderSVG({ badgeColor, label, labelColor, logo, logoColor, logoPath, text = '', textColor }) {
 
   const window = createSVGWindow();
   const { document } = window;
@@ -107,15 +117,39 @@ function renderSVG(badgeColor, logo, logoPath, logoColor, text = '', textColor) 
 
   let logoTextMargin = sidePadding;
 
+  let leftWidth = 0;
+  let rightWidth = 0;
+
+  let bgLeft, logoBackgroundColor, logoElement;
+
   const canvas = SVG(document.documentElement);
   // console.debug(`renderedLogoHeight before transform: ${renderedLogoHeight}`);
 
-  const gbackground = canvas.group();
+  const hasLabel = typeof label === 'string';
 
-  let logoElement;
+  if (hasLabel) {
+    bgLeft = canvas.group();
+  }
+
+  const bgRight = canvas.group();
+
+  if (hasLabel) {
+    // logo is going on the label rect and the label background is always the default grey
+    logoBackgroundColor = defaultBadgeColor;
+  }
+  else {
+    logoBackgroundColor = badgeColor;
+  }
+
+  // if label has value
+  // build rect/badge like normal, allow all params except can't change left side badge color
+  // can specify labelColor and logoColor, but they are subject to the usual contrast check
+
+  // then, iff text has value
+  // build 2nd rect with no logo, following existing logic
 
   if (typeof logo === 'string') {
-    logoElement = addLogo(canvas, logo, logoPath, badgeColor, logoColor, sidePadding);
+    logoElement = addLogo(canvas, logo, logoPath, logoBackgroundColor, logoColor, sidePadding);
   }
 
   const renderedLogoWidth = logoElement ? logoElement.rbox().width : 0;
@@ -124,23 +158,42 @@ function renderSVG(badgeColor, logo, logoPath, logoColor, text = '', textColor) 
     logoTextMargin = 0;
   }
 
-  let textWidth = 0;
+  let leftTextWidth = 0;
+  let rightTextWidth = 0;
 
-  if (text) {
-    textWidth = addText(canvas, text, textColor, badgeColor, sidePadding, renderedLogoWidth, logoTextMargin);
+  if (hasLabel) {
+
+    leftTextWidth = addText(canvas, label, labelColor, defaultBadgeColor, sidePadding, renderedLogoWidth, logoTextMargin);
+
+    leftWidth = sidePadding + renderedLogoWidth + logoTextMargin + leftTextWidth + sidePadding;
+    logoTextMargin = leftWidth;
+
+    bgLeft // bg (left side)
+      .rect(leftWidth, badgeHeight)
+      .fill(defaultBadgeColor);
+
+    // pass 0 for renderedLogoWidth because we already account for it in logoTextMargin
+    rightTextWidth = addText(canvas, text, textColor, badgeColor, sidePadding, 0, logoTextMargin);
+    rightWidth = sidePadding + rightTextWidth + sidePadding;
+  }
+  else {
+    rightTextWidth = addText(canvas, text, textColor, badgeColor, sidePadding, renderedLogoWidth, logoTextMargin);
+    rightWidth = sidePadding + renderedLogoWidth + logoTextMargin + rightTextWidth + sidePadding;
   }
 
-  const badgeWidth = sidePadding + renderedLogoWidth + logoTextMargin + textWidth + sidePadding;
+  // const badgeWidth = leftWidth + rightWidth;
+  // console.debug(badgeWidth);
+  // canvas.width(badgeWidth).height(badgeHeight);
 
-  canvas.width(badgeWidth).height(badgeHeight);
-
-  gbackground
-    .rect(badgeWidth, badgeHeight)
+  bgRight.group() // bg (right side)
+    .rect(rightWidth, badgeHeight)
     .fill(badgeColor);
 
-  const optimizedSVG = optimize(canvas.svg());
+  if (hasLabel) {
+    bgRight.move(leftWidth);
+  }
 
-  return optimizedSVG.data;
+  return optimize(canvas.svg()).data;
 
 }
 
