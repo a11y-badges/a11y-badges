@@ -30,7 +30,7 @@
     "get-contrast": "^3.0.0",
     "helmet": "^4.6.0",
     "simple-icons": "^5.13.0",
-    "svgdom": "^0.1.8",
+    "svgdom": "^0.1.14",
     "svgo": "^2.5.0",
     "txml": "^5.0.1"
   }
