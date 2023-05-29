@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/ctcpip/a11y-badges#readme",
   "devDependencies": {
-    "eslint": "^7.32.0",
+    "eslint": "^8.41.0",
     "jasmine": "^3.9.0",
     "looks-same": "^8.1.0"
   },
