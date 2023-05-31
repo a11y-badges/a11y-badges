@@ -2,8 +2,8 @@
 // note that to successfully deploy this function, package.json needs to have this file as the main:  "main": "./gcp/index.js",
 // deploy command: gcloud functions deploy badge --runtime nodejs16 --trigger-http --allow-unauthenticated --memory=128MB
 
-const functions = require('@google-cloud/functions-framework');
-const { getBadge } = require('../badge/generator');
+import functions from '@google-cloud/functions-framework';
+import { getBadge } from '../badge/generator.js';
 
 functions.http('badge', (req, res) => {
 

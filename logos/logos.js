@@ -1,8 +1,6 @@
-const fs = require('fs');
+import fs from 'fs';
 
-module.exports = {
-  afterburner: getLogo('afterburner'),
-};
+export const afterburnerLogo = getLogo('afterburner');
 
 function getLogo(name) {
   return fs.readFileSync(`./logos/files/${name}.svg`, { encoding: 'utf-8', flag: 'r' });

@@ -1,6 +1,6 @@
-const { getBadge } = require('../badge/generator');
-const b64Logos = require('./badge-refs/base64-logos');
-const looksSame = require('looks-same');
+import { getBadge } from '../badge/generator.js';
+import b64Logos from './badge-refs/base64-logos.js';
+import looksSame from 'looks-same';
 
 const dataImagePrefix = 'data:image/svg+xml;base64,';
 

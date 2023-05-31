@@ -1,11 +1,13 @@
-const simpleIcons = require('simple-icons');
-const fs = require('fs');
-const { getBadge, renderSVG } = require('./badge/generator');
-const { optimize } = require('svgo');
-const { afterburner: afterburnerLogo } = require('./logos/logos'); // eslint-disable-line no-unused-vars
+import * as simpleIcons from 'simple-icons/icons';
+import fs from 'fs';
+import { getBadge, renderSVG } from './badge/generator.js';
+import { optimize } from 'svgo';
+import { afterburnerLogo } from './logos/logos.js'; // eslint-disable-line no-unused-vars
 
 // writeTestBadge(null, afterburnerLogo, null, 'afterburner');
 // writeTestBadge(null, 'ibm', null, 'a11y badges');
+// const s = ``;
+// console.log(optimizeSVG(s, { returnEncoded: true }));
 
 function writeTestBadge(badgeColor, logo, logoColor, text, textColor) { // eslint-disable-line no-unused-vars
 
