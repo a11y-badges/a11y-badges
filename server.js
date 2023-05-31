@@ -1,6 +1,6 @@
-const express = require('express');
-const { getBadge } = require('./badge/generator');
-const helmet = require('helmet');
+import express from 'express';
+import { getBadge } from './badge/generator';
+import helmet from 'helmet';
 
 const app = express();
 

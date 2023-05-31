@@ -1,6 +1,6 @@
 // netlify serverless function definition (not in use; was only for PoC)
 
-const { getBadge } = require('../badge/generator');
+import { getBadge } from '../badge/generator';
 
 exports.handler = async function(event, /* context */) { // eslint-disable-line require-await
 

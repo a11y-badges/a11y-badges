@@ -1,6 +1,6 @@
 module.exports = {
   parserOptions: {
-    ecmaVersion: 2017,
+    ecmaVersion: 2023,
     sourceType: 'module',
     ecmaFeatures: {
       impliedStrict: true
@@ -119,7 +119,7 @@ module.exports = {
     'linebreak-style': 'error',
     'lines-around-comment': 'error',
     'max-depth': 'error',
-    'max-lines': 'error',
+    'max-lines': ['error', { 'max': 333, 'skipBlankLines': true }],
     'max-nested-callbacks': ['error', 4],
     'max-params': ['error', 6],
     'max-statements': ['error', 99],

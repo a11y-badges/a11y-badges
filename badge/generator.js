@@ -1,14 +1,14 @@
-const contrast = require('get-contrast');
-const simpleIcons = require('simple-icons');
-const { createSVGWindow } = require('svgdom');
-const { SVG, registerWindow } = require('@svgdotjs/svg.js');
-const { optimize } = require('svgo');
-const feather = require('feather-icons');
-const txml = require('txml');
+import contrast from 'get-contrast';
+import * as simpleIcons from 'simple-icons/icons';
+import { createSVGWindow } from 'svgdom';
+import { SVG, registerWindow } from '@svgdotjs/svg.js';
+import { optimize } from 'svgo';
+import feather from 'feather-icons';
+import * as txml from 'txml';
 
 const defaultBadgeColor = 'dimgrey';
 
-module.exports = {
+export {
   getBadge,
   renderSVG,
 };
@@ -26,14 +26,18 @@ function getBadge({ badgeColor, logo, logoColor, text, textColor } = {}) {
 
   useBadgeColor = color;
 
-  if (logo) {
+  // type check guards against `type confusion through parameter tampering` because we call `slice()`
+  if (typeof logo === 'string') {
 
     if (logo.startsWith('data:image') || logo.startsWith('<svg')) {
       useLogo = logo;
     }
-    else {
+    else if (logo.trim() !== '') {
 
-      icon = simpleIcons.Get(logo);
+      // convert to expected slug format
+      const siLogo = `si${logo.charAt(0).toUpperCase()}${logo.slice(1)}`;
+
+      icon = simpleIcons[siLogo];
 
       // first look for simple-icon
       if (icon) {
