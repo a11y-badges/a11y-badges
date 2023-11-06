@@ -22,7 +22,7 @@
   "devDependencies": {
     "eslint": "^8.41.0",
     "jasmine": "^5.0.0",
-    "looks-same": "^8.1.0"
+    "looks-same": "^9.0.0"
   },
   "dependencies": {
     "@svgdotjs/svg.js": "^3.1.2",
